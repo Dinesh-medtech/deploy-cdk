@@ -2,15 +2,6 @@ name: deploy cdk
 on:
   workflow_call:
     inputs:
-      environment:
-        required: true
-        type: string
-      projectName:
-        required: true
-        type: string
-      stackPrefix:
-        required: true
-        type: string
       awsDefaultRegion:
         required: true
         type: string
@@ -18,19 +9,12 @@ on:
     secrets:
       awsAcarinOIDCRole:
         required: true
-      awsAccountNumber:
-        required: true
 
 jobs:
   network:
-    environment: ${{ inputs.environment }}
     env:
       AWS_SECRET_ACARIN_OIDC_ROLE: ${{ secrets.awsAcarinOIDCRole }}
-      AWS_ACCOUNT_NUMBER: ${{secrets.awsAccountNumber}}
       AWS_DEFAULT_REGION: ${{ inputs.awsDefaultRegion }}
-      PROJECT_NAME: ${{inputs.projectName}}
-      STACK_PREFIX: ${{inputs.stackPrefix}}
-      ENV: ${{inputs.environment}}
       
     runs-on: ubuntu-latest
     

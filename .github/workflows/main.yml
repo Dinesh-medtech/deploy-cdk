@@ -1,0 +1,72 @@
+name: deploy cdk
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      projectName:
+        required: true
+        type: string
+      stackPrefix:
+        required: true
+        type: string
+      awsDefaultRegion:
+        required: true
+        type: string
+
+    secrets:
+      awsAcarinOIDCRole:
+        required: true
+      awsAccountNumber:
+        required: true
+
+jobs:
+  network:
+    environment: ${{ inputs.environment }}
+    env:
+      AWS_SECRET_ACARIN_OIDC_ROLE: ${{ secrets.awsAcarinOIDCRole }}
+      AWS_ACCOUNT_NUMBER: ${{secrets.awsAccountNumber}}
+      AWS_DEFAULT_REGION: ${{ inputs.awsDefaultRegion }}
+      PROJECT_NAME: ${{inputs.projectName}}
+      STACK_PREFIX: ${{inputs.stackPrefix}}
+      ENV: ${{inputs.environment}}
+      
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+      
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        
+      - name: Setup Nodejs and npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          
+      - name: Setup yarn
+        run: npm install -g yarn
+        
+      - name: Setup AWS SAM cli
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.AWS_SECRET_ACARIN_OIDC_ROLE }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-session-name: "GitHubActions"
+          
+      - name: Build and Deploy CDK
+        run: |
+          cd cdk
+          yarn install --frozen-lockfile
+          yarn test
+          yarn cdk synth
+          yarn cdk diff
+          yarn cdk deploy --app 'cdk.out/' --require-approval never

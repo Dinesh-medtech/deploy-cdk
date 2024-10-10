@@ -1,0 +1,14 @@
+
+name: Deploy cdk
+
+on:
+  workflow_dispatch:
+    
+
+jobs:
+  Infra_DEV:
+    uses: ./.github/workflows/main.yml
+    with:
+      awsDefaultRegion: 'us-east-1'
+    secrets:
+      awsAcarinOIDCRole: ${{ secrets.AWS_SECRET_ACARIN_OIDC_ROLE }}

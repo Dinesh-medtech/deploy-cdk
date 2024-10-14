@@ -1,27 +1,42 @@
 import * as cdk from 'aws-cdk-lib';
-import { Vpc, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { ApplicationLoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import { Vpc,Subnet,SecurityGroup } from 'aws-cdk-lib/aws-ec2';
+import { Fn } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-interface LoadBalancerStackProps extends cdk.StackProps {
-  vpc: Vpc;
-  securityGroup: SecurityGroup;
-}
-
 export class LoadBalancerStack extends cdk.Stack {
-  public readonly loadBalancer: ApplicationLoadBalancer;
-
-  constructor(scope: Construct, id: string, props: LoadBalancerStackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Application Load Balancer 
-    this.loadBalancer = new ApplicationLoadBalancer(this, 'MyALB', {
-      vpc: props.vpc,
+    // Import VPC and Security Group using Fn.importValue
+    const vpc = Vpc.fromLookup(this, 'ImportedVpc', {
+      vpcId: Fn.importValue('VpcId'), 
+    });
+
+    const securityGroup = SecurityGroup.fromSecurityGroupId(this, 'ImportedSecurityGroup', 
+      Fn.importValue('SecurityGroupId') 
+    );
+
+    const publicSubnet1 = Subnet.fromSubnetId(this, 'PublicSubnet1', 
+      Fn.importValue('PublicSubnetId1')
+    );
+    
+    //Application Load Balancer in the imported VPC
+    const loadBalancer = new ApplicationLoadBalancer(this, 'MyALB', {
+      vpc: vpc,
       internetFacing: true,
-      securityGroup: props.securityGroup, 
+      securityGroup: securityGroup,
       vpcSubnets: {
-        subnetType: SubnetType.PUBLIC,  
+        subnets: [
+          { subnetId: publicSubnet1 }, 
+        ],
       }
+    });
+
+    // Output Load Balancer DNS
+    new cdk.CfnOutput(this, 'LoadBalancerDns', {
+      value: loadBalancer.loadBalancerDnsName,
+      exportName: 'LoadBalancerDns',
     });
   }
 }

@@ -12,10 +12,7 @@ export class MainStack extends cdk.Stack {
     const vpcStack = new VpcStack(this, 'VpcStack');
 
     // Load Balancer 
-    new LoadBalancerStack(this, 'LoadBalancerStack', {
-      vpc: vpcStack.vpc,
-      securityGroup: vpcStack.securityGroup,
-    });
+    new LoadBalancerStack(this, 'LoadBalancerStack');
 
     // KMS Key
     new KmsStack(this, 'KmsStack');

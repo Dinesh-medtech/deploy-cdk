@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Vpc, SubnetType,Subnet, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
+import { Vpc, SubnetType, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
 
 export class VpcStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -28,7 +28,6 @@ export class VpcStack extends cdk.Stack {
     const securityGroup = new SecurityGroup(this, 'MySecurityGroup', {
       vpc,
       allowAllOutbound: true,
-      description: 'Allow access to my resources',
       securityGroupName: 'MySecurityGroup',
     });
 
@@ -45,18 +44,15 @@ export class VpcStack extends cdk.Stack {
     });
 
     // Export the Public Subnet IDs
-      new cdk.CfnOutput(this, `PublicSubnetId1`, {
-        value: subnet.subnetId,
-        exportName: `publicSubnetId1`,
-      });
-    
+    new cdk.CfnOutput(this, 'PublicSubnetId1', {
+      value: vpc.publicSubnets[0].subnetId, 
+      exportName: 'PublicSubnetId1',
+    });
 
     // Export the Private Subnet IDs
-    vpc.privateSubnets.forEach((subnet, index) => {
-      new cdk.CfnOutput(this, `PublicSubnetId1`, {
-        value: subnet.subnetId,
-        exportName: `publicSubnetId2`,  
-      });
+    new cdk.CfnOutput(this, 'PrivateSubnetId1', {
+      value: vpc.privateSubnets[0].subnetId, 
+      exportName: 'PrivateSubnetId1',
     });
   }
 }

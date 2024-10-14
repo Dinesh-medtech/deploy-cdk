@@ -6,7 +6,7 @@ export class VpcStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create a new VPC with public and private subnets
+    // VPC 
     const vpc = new Vpc(this, 'MyVpc', {
       maxAzs: 2, 
       natGateways: 1, 
@@ -24,7 +24,7 @@ export class VpcStack extends cdk.Stack {
       ],
     });
 
-    // Create a new Security Group
+    // Security Group
     const securityGroup = new SecurityGroup(this, 'MySecurityGroup', {
       vpc,
       allowAllOutbound: true,

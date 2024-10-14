@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Vpc, SubnetType, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
+import { Vpc, SubnetType,Subnet, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
 
 export class VpcStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -45,12 +45,11 @@ export class VpcStack extends cdk.Stack {
     });
 
     // Export the Public Subnet IDs
-    vpc.publicSubnets.forEach((subnet, index) => {
       new cdk.CfnOutput(this, `PublicSubnetId1`, {
         value: subnet.subnetId,
         exportName: `publicSubnetId1`,
       });
-    });
+    
 
     // Export the Private Subnet IDs
     vpc.privateSubnets.forEach((subnet, index) => {

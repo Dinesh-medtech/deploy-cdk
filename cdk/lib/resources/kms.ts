@@ -10,7 +10,7 @@ export class KmsStack extends cdk.Stack {
 
     // KMS Key
     this.kmsKey = new Key(this, 'MyKmsKey', {
-      enableKeyRotation: true,
+       removalPolicy: RemovalPolicy.RETAIN,
     });
   }
 }

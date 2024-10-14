@@ -17,14 +17,13 @@ export class LoadBalancerStack extends cdk.Stack {
       Fn.importValue('SecurityGroupId') 
     );
 
-    const publicSubnet1 = Subnet.fromSubnetId(this, 'PublicSubnet1', 
+    const publicSubnet1 = Subnet.fromSubnetId(this, 'ImportedPublicSubnet1', 
       Fn.importValue('PublicSubnetId1')
     );
-    
+     
     //Application Load Balancer in the imported VPC
     const loadBalancer = new ApplicationLoadBalancer(this, 'MyALB', {
       vpc: vpc,
-      internetFacing: true,
       securityGroup: securityGroup,
       vpcSubnets: {
         subnets: [
